@@ -10,14 +10,14 @@ class Installer:
         if os.path.isdir('/content/sample_data'):
             shutil.rmtree('/content/sample_data')
 
-        os.chdir('/content/servicedesign/')
+        os.chdir('/content/unstable/')
         try: 
             import openai
         except ImportError:
             print("Installing uncommon...")
             subprocess.check_call(["pip", "install", "-r", "./requirements.txt"])
         
-        print("Installed uncommon")
+        print("Installed unstable")
         
         from src.utils.env_loader import load_env_file
         self.env_values = load_env_file(self.env_file_path, False)
