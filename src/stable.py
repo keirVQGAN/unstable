@@ -2,45 +2,59 @@ import requests
 import yaml
 import time
 import json
+import itertools
+from src.utils.response_processor import ResponseProcessor
 
 class StableAPI:
+
+    BASE_URL = 'https://stablediffusionapi.com/api'
+    CONFIG_PATH = './config/stable'
+    HEADERS = {"Content-Type": "application/json"}
+
     def __init__(self, api_key=None):
         self.api_key = api_key
 
-    def request(self, call=None, prompt=None, negative_prompt=None, init_image=None, mask_image=None,
-                enhance_prompt=None, guidance_scale=None, height=None, width=None, samples=None,
-                num_inference_steps=None, self_attention=None, upscale=None, seed=None):
-        
-        url = f'https://stablediffusionapi.com/api/v3/{call}'
-        yaml_file = f'./config/stable/{call}.yml'
+    @staticmethod
+    def _load_yaml(file):
+        with open(file, 'r') as f:
+            return yaml.safe_load(f)
 
-        with open(yaml_file, 'r') as f:
-            api_options = yaml.safe_load(f)
-
-        api_options.update({
-            'prompt': prompt,
-            'key': self.api_key,
-            'negative_prompt': negative_prompt,
-            'init_image': init_image or api_options.get('init_image'),
-            'mask_image': mask_image or api_options.get('mask_image'),
-            'enhance_prompt': enhance_prompt or api_options.get('enhance_prompt'),
-            'guidance_scale': guidance_scale or api_options.get('guidance_scale'),
-            'height': height or api_options.get('height'),
-            'width': width or api_options.get('width'),
-            'samples': samples or api_options.get('samples'),
-            'num_inference_steps': num_inference_steps or api_options.get('num_inference_steps'),
-            'self_attention': self_attention or api_options.get('self_attention'),
-            'upscale': upscale or api_options.get('upscale'),
-            'seed': seed or api_options.get('seed')
-        })
-
-        headers = {"Content-Type": "application/json"}
-        response = requests.post(url=url, headers=headers, json=api_options)
-
+    def _make_request(self, url, json_body):
+        response = requests.post(url=url, headers=self.HEADERS, json=json_body)
         try:
-            response_data = response.json()
+            return response.json()
         except json.JSONDecodeError:
             print(f"Failed to parse JSON from response. Status code: {response.status_code}, Response text: {response.text}")
             return None
 
-        return response_data
+    def request(self, call=None, **kwargs):
+        url = f'{self.BASE_URL}/v5/controlnet' if call == 'controlnet' else f'{self.BASE_URL}/v3/{call}'
+        yaml_file = f'{self.CONFIG_PATH}/controlnet.yml' if call == 'controlnet' else f'{self.CONFIG_PATH}/{call}.yml'
+
+        api_options = self._load_yaml(yaml_file)
+        api_options.update(kwargs)
+        api_options['key'] = self.api_key
+
+        return self._make_request(url, api_options)
+
+    def get_responses(self, options_dict, debug=False):
+        keys, values = zip(*options_dict.items())
+        combos = [dict(zip(keys, v)) for v in itertools.product(*values)]
+
+        responses = []
+        for combo in combos:
+            response_data = self.request(**combo)
+            if debug:
+                self.debug_message(combo, response_data)
+            responses.append(response_data)
+        
+        return responses
+
+    @staticmethod
+    def debug_message(combo, response_data):
+        print('Rendering: ' + str(combo))
+        status = response_data['status']
+        if status == 'success':
+            print(str(response_data['output']) + '\n')
+        elif status == 'processing':
+            print('Processing Image. Run fetch after ' + str(round(float(response_data['eta']), 2)) + ' sec.\n')
