@@ -19,7 +19,7 @@ class Installer:
         
         print("Installed unstable")
         
-        from src.utils.env_loader import load_env_file
+        from src.utils.sys_utils import load_env_file
         self.env_values = load_env_file(self.env_file_path, False)
 
         # Set variables based on the values in env_values dictionary
