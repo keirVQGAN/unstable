@@ -24,16 +24,32 @@ def image_download(url, path):
 
 def fetch_images(file_path, api_key):
     with open(file_path, 'r') as f:
-        for item in json.load(f):
-            response = requests.post(
-                f"https://stablediffusionapi.com/api/v3/fetch/{item['id']}",
-                headers={'Content-Type': 'application/json'},
-                data=json.dumps({"key": api_key})
-            )
-            
-            if response.status_code != 200:
-                continue
+        data = json.load(f)
 
-            for image_url in response.json()['output']:
-                image_download(image_url, f'./output/images/{item["id"]}/{os.path.basename(image_url)}')
+    updated_data = []
+    for item in data:
+        url = f"https://stablediffusionapi.com/api/v3/fetch/{item['id']}"
+        headers = {'Content-Type': 'application/json'}
+        post_data = json.dumps({"key": api_key})
+
+        response = requests.post(url, headers=headers, data=post_data)
+        response_data = response.json()
+
+        if response_data.get('status') == 'success' and response_data.get('output'):
+            output_path = f'./output/images/{item["id"]}'
+            try:
+                for image_url in response_data['output']:
+                    image_download(image_url, f'{output_path}/{os.path.basename(image_url)}')
+                    print(f"Successfully downloaded image from {image_url}")
+            except Exception as e:
+                print(f"An error occurred while downloading images: {e}")
+                updated_data.append(item)
+        elif response_data.get('status') == 'processing':
+            print(f"Image isn't ready to fetch yet. Try again at {item.get('available')}")
+            updated_data.append(item)
+        else:
+            updated_data.append(item)
+
+    with open(file_path, 'w') as f:
+        json.dump(updated_data, f)
 
