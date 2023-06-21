@@ -1,3 +1,4 @@
+import os
 from PIL import Image
 from pathlib import Path
 from psd_tools import PSDImage
