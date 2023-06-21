@@ -47,7 +47,8 @@ class StableAPI:
             if debug:
                 self.debug_message(combo, response_data)
             responses.append(response_data)
-        
+            status = response_data['status']
+            print(status)
         return responses
 
     @staticmethod
