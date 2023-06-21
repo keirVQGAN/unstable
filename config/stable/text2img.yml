@@ -1,0 +1,19 @@
+key: ""
+prompt: ""
+negative_prompt: ""
+embeddings_model: null
+enhance_prompt: 'yes'
+guidance_scale: 7.5
+height: 720
+width: 720
+samples: 1
+num_inference_steps: 41
+multi_lingual: 'no'
+self_attention: 'no'
+upscale: 'no'
+panorama: 'no'
+safety_checker: null
+seed: null
+track_id: null
+webhook: null
+

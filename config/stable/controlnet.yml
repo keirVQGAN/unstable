@@ -1,0 +1,22 @@
+key: null
+controlnet_model: "canny"
+controlnet_type: "canny"
+model_id: "midjourney"
+auto_hint: "yes"
+guess_mode: "no"
+prompt: "a model doing photoshoot, ultra high resolution, 4K image"
+negative_prompt: null
+init_image: "https://huggingface.co/takuma104/controlnet_dev/resolve/main/gen_compare/control_images/converted/control_human_openpose.png"
+mask_image: "https://raw.githubusercontent.com/CompVis/stable-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo_mask.png"
+width: "512"
+height: "512"
+samples: "1"
+scheduler: "UniPCMultistepScheduler"
+num_inference_steps: "30"
+safety_checker: "no"
+enhance_prompt: "yes"
+guidance_scale: 7.5
+strength: 0.55
+seed: null
+webhook: null
+track_id: null

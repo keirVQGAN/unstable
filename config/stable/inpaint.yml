@@ -1,0 +1,15 @@
+key: null
+enhance_prompt: 'yes'
+guidance_scale: 1
+height: 1024
+init_image: null
+mask_image: null
+negative_prompt: null
+num_inference_steps: 21
+safety_checker: null
+samples: 1
+seed: null
+strength: 1.0
+track_id: null
+webhook: null
+width: 1024
