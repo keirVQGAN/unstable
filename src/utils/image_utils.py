@@ -2,7 +2,7 @@ import os
 import requests
 import shutil
 
-def download_img(url, path):
+def image_download(url, path):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     response = requests.get(url, stream=True)
 
