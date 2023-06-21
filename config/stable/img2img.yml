@@ -1,15 +1,15 @@
-key: null
+key: ""
 enhance_prompt: 'yes'
-guidance_scale: 1
+prompt: 'a medium format photograph of beautiful woven mask made from neon paint spattered brambles and ivy shot with a Hasseblad camera in high-key lighting'
+negative_prompt: 'woman, model, human, person, portrait, lips, girl, sexy, man, child, girl, boy'
+guidance_scale: 7
 height: 1024
-init_image: null
-negative_prompt: null
-num_inference_steps: 21
-safety_checker: null
-samples: 1
-seed: null
-strength: 1.0
-track_id: null
-url: https://stablediffusionapi.com/api/v3/img2img
-webhook: null
 width: 1024
+samples: 3
+strength: 0.7
+num_inference_steps: 41
+seed: null
+init_image: null
+safety_checker: null
+track_id: null
+webhook: null
