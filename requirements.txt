@@ -1,0 +1,8 @@
+openai
+tiktoken
+simplejson
+nltk
+python-docx
+gradio
+pyuploadcare
+python-dotenv
