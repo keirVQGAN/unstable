@@ -2,6 +2,7 @@ import os
 import requests
 import shutil
 
+
 def image_download(url, path):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     response = requests.get(url, stream=True)
@@ -18,4 +19,20 @@ def image_download(url, path):
     else:
         print(f"Error downloading image: {response.status_code} - {response.text}")
         return None
+
+
+def fetch_images(file_path, api_key):
+    with open(file_path, 'r') as f:
+        for item in json.load(f):
+            response = requests.post(
+                f"https://stablediffusionapi.com/api/v3/fetch/{item['id']}",
+                headers={'Content-Type': 'application/json'},
+                data=json.dumps({"key": api_key})
+            )
+            
+            if response.status_code != 200:
+                continue
+
+            for image_url in response.json()['output']:
+                image_download(image_url, f'./output/images/{item["id"]}/{os.path.basename(image_url)}')
 
