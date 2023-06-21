@@ -1,6 +1,8 @@
 import os
 import requests
 import shutil
+import json
+from src.utils.image_utils import image_download
 
 
 def image_download(url, path):
