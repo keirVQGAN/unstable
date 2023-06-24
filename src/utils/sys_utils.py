@@ -31,10 +31,12 @@ def load_env_file(env_file_path, print_details=True):
     return env_values
 
 
-def str2list(string):
-    """Splits a string into a list by commas."""
-
-    return string.split(',')
+def str2list(s, ignore_commas=False):
+    if ignore_commas:
+        return [s]
+    if s.replace(',','').replace('.','').isdigit():
+        return [str(i.strip()) for i in s.split(',')]
+    return [s]
 
 
 def docx_to_txt(docx_path):
