@@ -2,6 +2,38 @@ import os
 import requests
 import shutil
 import json
+import matplotlib.pyplot as plt
+from PIL import Image
+from IPython.display import display
+
+
+def img_to_grid(path, ext="png"):
+    images = []
+    # recursive search for png images
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if file.endswith(ext):
+                images.append(os.path.join(root, file))
+
+    # determine the grid size
+    num_images = len(images)
+    grid_size = int(num_images ** 0.5)
+
+    # create subplot grid
+    fig, axs = plt.subplots(grid_size, grid_size, figsize=(20, 20))
+
+    # fill grid with images
+    for i, ax in enumerate(axs.flat):
+        if i < num_images:
+            img = Image.open(images[i])
+            ax.imshow(img)
+            ax.axis('off')  # don't show the axes for each image
+        else:
+            ax.remove()  # remove the extra axes without images
+
+    # show the grid of images
+    plt.show()
+
 
 
 def image_download(url, path):
