@@ -31,7 +31,7 @@ class ImageUploader:
             uploaded_files = {}
 
         if img_path in uploaded_files:
-            print(f"Image at path {img_path} has already been uploaded.")
+            # print(f"Image at path {img_path} has already been uploaded.")
             return uploaded_files[img_path]
         
         with open(img_path, 'rb') as file_object:
