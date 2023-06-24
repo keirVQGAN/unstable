@@ -6,6 +6,7 @@ import itertools
 from src.utils.response_processor import ResponseProcessor
 from src.utils.image_utils import fetch_images
 from src.utils.image_upload import ImageUploader
+from src.utils.sys_utils import str2list
 
 class StableAPI:
     BASE_URL = 'https://stablediffusionapi.com/api'
