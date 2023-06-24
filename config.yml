@@ -1,0 +1,19 @@
+call: "img2img"
+init_image:
+  - "/content/image.png"
+  - "/content/image2.png"
+prompt: 
+  - "superhero otter"
+  - "superhero snail"
+negative_prompt: 
+  - ""
+seed: ""
+strength: "0.5"
+stable_guidance_scale: "7"
+height: "512"
+width: "512"
+samples: "1"
+num_inference_steps: "21"
+enhance_prompt: "yes"
+self_attention: "yes"
+upscale: "no"
