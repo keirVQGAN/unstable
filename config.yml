@@ -1,7 +1,7 @@
 call: "img2img"
 init_image:
-  - "/content/drive/MyDrive/unstable/test_image.png"
-  - "/content/drive/MyDrive/unstable/test_image2.png"
+  - "/content/drive/MyDrive/unstable/images/test_image.png"
+  - "/content/drive/MyDrive/unstable/images/test_image2.png"
 prompt: 
   - "superhero otter"
   - "superhero snail"
