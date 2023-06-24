@@ -16,6 +16,27 @@ class StableAPI:
         self.api_key = api_key
         self.uploader = ImageUploader()
 
+    def yml_to_options(self, filename):
+        # Load the options from the yaml file
+        with open(filename, 'r') as stream:
+            config = yaml.safe_load(stream)
+
+        # Create the options dictionary with loaded inputs
+        options_batch = {}
+
+        for key, value in config.items():
+            if key == "prompt":
+                # Format 'prompt' values accordingly
+                options_batch[key] = [p for p in value]
+            elif key == "negative_prompt":
+                # 'negative_prompt' values can be assigned directly
+                options_batch[key] = value
+            else:
+                # Other key-value pairs are processed here
+                options_batch[key] = str2list(value) if isinstance(value, str) else value
+
+        return options_batch
+
     def _load_yaml(self, file):
         with open(file, 'r') as f:
             return yaml.safe_load(f)
