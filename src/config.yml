@@ -11,10 +11,10 @@ init_image:
 prompt:
   - " An award winning portrait of an otters face shot with a Hasselblad medium format camera in high-key lighting"
 negative_prompt: 
-  - ""
+  - "human, extra features, man, woman, child, girl, boy, model"
 seed: ""
-strength: "0.5"
-stable_guidance_scale: "12"
+strength: "0.8"
+stable_guidance_scale: "8"
 height: "1024"
 width: "1024"
 samples: "1"
