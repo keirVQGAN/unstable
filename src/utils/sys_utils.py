@@ -4,6 +4,26 @@ import zipfile
 import shutil
 from dotenv import load_dotenv
 from docx import Document
+from datetime import datetime
+
+
+def stable_sync(src, dst):
+    src, dst = Path(src), Path(dst)
+    if not src.exists():
+        print(f"Source folder {src} does not exist")
+        return
+
+    timestamp = datetime.now().strftime("%m%d_%H%M")
+    dst = dst / timestamp
+    dst.mkdir(parents=True)
+
+    for item in src.iterdir():
+        if item.is_dir():
+            shutil.copytree(str(item), str(dst / item.name))
+        else:
+            shutil.copy2(str(item), str(dst / item.name))
+
+    src.rename(src.parent / timestamp)
 
 
 ENV_VARIABLES = [
