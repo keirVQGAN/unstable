@@ -1,19 +1,18 @@
 call: "img2img"
 init_image:
-  - "/content/drive/MyDrive/unstable/images/test_image.png"
-  - "/content/drive/MyDrive/unstable/images/test_image2.png"
-prompt: 
-  - "superhero otter"
-  - "superhero snail"
-negative_prompt: 
-  - ""
-seed: ""
-strength: "0.5"
-stable_guidance_scale: "7"
-height: "512"
-width: "512"
+  - "/content/drive/MyDrive/unstable/images/bee/bee-01.jpg"
+  - "/content/drive/MyDrive/unstable/images/bee/bee-02.jpg"
+prompt:
+  - "An award-winning black-and-white woodcut print of a bee's face, symmetrical features, flat focus, illustration, purism, masterpiece ink illustration, black-and-white illustration, woodcut style, single-ink, front facing, full face, black ink, (centered image composition), expressive lines, sharp line, crisp, full face shot, (high contrast black-and-white), lino-cut print, master printmaker."
+negative_prompt:
+  - "extra body parts, mutated body parts, unnatural features, distorted appearance, abnormal characteristics, mutilated features, deformed body parts, misshapen attributes, altered morphology, irregular structure"
+seed: "null"
+strength: "0.5,0.6,0.7"
+guidance_scale: "7,8,9,10"
+height: "1024"
+width: "1024"
 samples: "1"
-num_inference_steps: "21"
-enhance_prompt: "yes"
+num_inference_steps: "41"
+enhance_prompt: "no"
 self_attention: "yes"
 upscale: "no"
