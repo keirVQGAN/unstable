@@ -2,7 +2,7 @@ import json
 from src.transcript_cleaner import TranscriptCleaner
 
 
-def clean_and_save_transcript(transcript_path, excel_path, student_name, tutor_name, json_file_path, debug=True):
+def clean_transcript(transcript_path, excel_path, student_name, tutor_name, json_file_path, debug=True):
     # Instantiate the TranscriptCleaner class
     transcript_cleaner = TranscriptCleaner(
         transcript_path=transcript_path,
