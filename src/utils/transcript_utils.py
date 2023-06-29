@@ -1,5 +1,7 @@
 import json
 from src.transcript_cleaner import TranscriptCleaner
+
+
 def clean_and_save_transcript(transcript_path, excel_path, student_name, tutor_name, json_file_path, debug=True):
     # Instantiate the TranscriptCleaner class
     transcript_cleaner = TranscriptCleaner(
@@ -30,16 +32,3 @@ def clean_and_save_transcript(transcript_path, excel_path, student_name, tutor_n
         json_content = json_file.read()
 
     return json_content
-
-json_file_path = "cleaned_data.json"
-json_content = clean_and_save_transcript(
-    transcript_path='/content/Pray.txt',
-    excel_path='/content/Pre-Tutorial Form.xlsx',
-    student_name='Purui Li',
-    tutor_name='Keir Williams',
-    json_file_path=json_file_path,
-    debug=True
-)
-
-print("Cleaned data saved to JSON file:", json_file_path)
-print(json_content)
