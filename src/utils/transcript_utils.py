@@ -32,7 +32,7 @@ def transcript(transcript_path, pre_notes_path, openai_api_key, transcript_yml='
     student_name = os.path.basename(transcript_path).replace('.txt', '')
     student_folder = os.path.join(os.getcwd(), 'output/transcripts', f'{student_name}_{date_slug}')
 
-    gdrive_backup = f'{os.path.basename(student_folder)}_{date_slug}'
+    gdrive_backup = f'{os.path.basename(student_folder)}'
     gdrive_backup_path = os.path.join(gdrive_backup_transcription, gdrive_backup)
 
     os.makedirs(student_folder, exist_ok=True)
