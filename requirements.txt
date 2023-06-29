@@ -7,3 +7,4 @@ gradio
 pyuploadcare
 python-dotenv
 psd_tools
+cleantext
