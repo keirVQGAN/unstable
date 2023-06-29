@@ -3,7 +3,6 @@ tiktoken
 simplejson
 nltk
 python-docx
-gradio
 pyuploadcare
 python-dotenv
 psd_tools
