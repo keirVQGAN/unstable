@@ -1,4 +1,5 @@
 import json
+from src.transcript_cleaner import TranscriptCleaner
 
 def clean_transcript(transcript_path, excel_path, student_name, tutor_name, json_file_path, debug=True):
     # Instantiate the TranscriptCleaner class
