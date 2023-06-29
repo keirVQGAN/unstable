@@ -51,7 +51,7 @@ def transcript(transcript_path, pre_notes_path, json_file_path, openai_api_key, 
         print(f'Transcript: {transcript_clean}')
         print(f'Pre Notes: {pre_notes_clean}')
 
-    with open('/content/unstable/config/transcript/config_transcript.yml', 'r') as file:
+    with open('./config/transcript/config_transcript.yml', 'r') as file:
         config = yaml.safe_load(file)
 
     user_message = config['user_message'].format(transcript_clean=transcript_clean, pre_notes_clean=pre_notes_clean, student=student_name)
