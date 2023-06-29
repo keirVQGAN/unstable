@@ -50,6 +50,7 @@ def transcript(transcript_path, pre_notes_path, openai_api_key, transcript_yml='
 
     if debug:
         print(f'Summarising tutorial with: {student_name}')
+        print()
         print(f'Transcript: {transcript_clean}')
         print(f'Pre Notes: {pre_notes_clean}')
 
@@ -59,6 +60,7 @@ def transcript(transcript_path, pre_notes_path, openai_api_key, transcript_yml='
     user_message = config['user_message'].format(transcript_clean=transcript_clean, pre_notes_clean=pre_notes_clean, student=student_name)
 
     if debug:
+        print()
         print(f"System Prompt: {config['system_prompt']}")
         print(f"User Message: {user_message}")
 
