@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+import nltk
 
 class Installer:
     def __init__(self, env_file_path='/content/drive/MyDrive/oracle/.env'):
@@ -16,7 +17,8 @@ class Installer:
         except ImportError:
             print("Installing uncommon...")
             subprocess.check_call(["pip", "install", "-r", "./requirements.txt"])
-        
+            
+        nltk.download('stopwords')
         print("Installed unstable")
         
         from src.utils.sys_utils import load_env_file
