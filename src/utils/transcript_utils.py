@@ -30,7 +30,7 @@ def clean_transcript(transcript_path, excel_path, student_name, tutor_name, debu
 def transcript(transcript_path, pre_notes_path, openai_api_key, transcript_yml='/content/unstable/config/transcript/config_transcript.yml', model='gpt-4', count_tokens=False, chat=False, debug=False, tutor_name='Keir Williams', gdrive_backup_transcription='/content/drive/MyDrive/unstable/transcription/output'):
     date_slug = datetime.now().strftime('%m-%d_%H-%M')
     student_name = os.path.basename(transcript_path).replace('.txt', '')
-    student_folder = os.path.join(os.getcwd(), 'output/transcripts', f'student_name{date_slug}')
+    student_folder = os.path.join(os.getcwd(), 'output/transcripts', f'{student_name}_{date_slug}')
 
     gdrive_backup = f'{os.path.basename(student_folder)}_{date_slug}'
     gdrive_backup_path = os.path.join(gdrive_backup_transcription, gdrive_backup)
