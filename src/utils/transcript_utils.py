@@ -2,12 +2,15 @@ import yaml
 import json
 import os
 import shutil
+from datetime import datetime
 from src.chatbot import Chatbot
 from src.transcript_cleaner import TranscriptCleaner
+
 
 def read_file(file_path):
     with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
         return file.read()
+
 
 def clean_transcript(transcript_path, excel_path, student_name, tutor_name, debug=True):
     transcript_cleaner = TranscriptCleaner(
@@ -24,9 +27,13 @@ def clean_transcript(transcript_path, excel_path, student_name, tutor_name, debu
     return transcript_clean, pre_notes_clean
 
 
-def transcript(transcript_path, pre_notes_path, openai_api_key, transcript_yml='/content/unstable/config/transcript/config_transcript.yml', model='gpt-4', count_tokens=False, chat=False, debug=False, tutor_name='Keir Williams'):
+def transcript(transcript_path, pre_notes_path, openai_api_key, transcript_yml='/content/unstable/config/transcript/config_transcript.yml', model='gpt-4', count_tokens=False, chat=False, debug=False, tutor_name='Keir Williams', gdrive_backup_transcription='/content/drive/MyDrive/unstable/transcription/output'):
+    date_slug = datetime.now().strftime('%m-%d_%H-%M')
     student_name = os.path.basename(transcript_path).replace('.txt', '')
-    student_folder = os.path.join(os.getcwd(), student_name)
+    student_folder = os.path.join(os.getcwd(), 'output/transcripts', f'student_name{date_slug}')
+
+    gdrive_backup = f'{os.path.basename(student_folder)}_{date_slug}'
+    gdrive_backup_path = os.path.join(gdrive_backup_transcription, gdrive_backup)
 
     os.makedirs(student_folder, exist_ok=True)
 
@@ -87,3 +94,7 @@ def transcript(transcript_path, pre_notes_path, openai_api_key, transcript_yml='
 
         # Copy the original transcript file to the student's folder
         shutil.copy(transcript_path, os.path.join(student_folder, os.path.basename(transcript_path) + '_transcript'))
+
+        # Copy the student folder to gdrive
+        shutil.copytree(student_folder, gdrive_backup_path)   
+
