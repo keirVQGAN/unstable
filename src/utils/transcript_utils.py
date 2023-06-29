@@ -33,7 +33,7 @@ def clean_transcript(transcript_path, excel_path, student_name, tutor_name, json
 
 
 
-def main(transcript_path, pre_notes_path, json_file_path, openai_api_key, model='gpt-4', count_tokens=False, chat=False, debug=False, tutor_name='Keir Williams'):
+def transcript(transcript_path, pre_notes_path, json_file_path, openai_api_key, model='gpt-4', count_tokens=False, chat=False, debug=False, tutor_name='Keir Williams'):
     # Extracting student's name from the transcript file name
     student_name = os.path.basename(transcript_path).replace('.txt', '')
 
