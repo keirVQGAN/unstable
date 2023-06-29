@@ -4,7 +4,7 @@ import os
 from src.chatbot import Chatbot
 from src.transcript_cleaner import TranscriptCleaner
 
-def clean_transcript(transcript_path, excel_path, student_name, tutor_name, json_file_path, debug=True):
+def clean_transcript(transcript_path, excel_path, student_name, tutor_name, debug=True):
     # Instantiate the TranscriptCleaner class
     transcript_cleaner = TranscriptCleaner(
         transcript_path=transcript_path,
@@ -20,20 +20,10 @@ def clean_transcript(transcript_path, excel_path, student_name, tutor_name, json
     # Call the clean_pre_tutorial_notes method
     pre_notes_clean = transcript_cleaner.clean_pre_tutorial_notes()
 
-    # Save the cleaned transcript and pre-tutorial notes to a JSON file
-    data = {
-        "transcript_clean": transcript_clean,
-        "pre_notes_clean": pre_notes_clean
-    }
-
-    with open(json_file_path, "w") as json_file:
-        json.dump(data, json_file, indent=4)
-
     return transcript_clean, pre_notes_clean
 
 
-
-def transcript(transcript_path, pre_notes_path, json_file_path, openai_api_key, model='gpt-4', count_tokens=False, chat=False, debug=False, tutor_name='Keir Williams'):
+def transcript(transcript_path, pre_notes_path, openai_api_key, transcript_yml='/content/unstable/config/transcript/config_transcript.yml', model='gpt-4', count_tokens=False, chat=False, debug=False, tutor_name='Keir Williams'):
     # Extracting student's name from the transcript file name
     student_name = os.path.basename(transcript_path).replace('.txt', '')
 
@@ -42,7 +32,7 @@ def transcript(transcript_path, pre_notes_path, json_file_path, openai_api_key, 
         excel_path=pre_notes_path,
         student_name=student_name,
         tutor_name=tutor_name,
-        json_file_path=json_file_path,
+        # json_file_path=json_file_path,
         debug=debug
     )
 
@@ -51,7 +41,7 @@ def transcript(transcript_path, pre_notes_path, json_file_path, openai_api_key, 
         print(f'Transcript: {transcript_clean}')
         print(f'Pre Notes: {pre_notes_clean}')
 
-    with open('./config/transcript/config_transcript.yml', 'r') as file:
+    with open(transcript_yml, 'r') as file:
         config = yaml.safe_load(file)
 
     user_message = config['user_message'].format(transcript_clean=transcript_clean, pre_notes_clean=pre_notes_clean, student=student_name)
