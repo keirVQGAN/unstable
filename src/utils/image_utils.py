@@ -109,3 +109,133 @@ def fetch_images(file_path, api_key):
     with open(file_path, 'w') as f:
         json.dump(updated_data, f)
 
+
+def create_web_files(path, bg_color, dir_name="web_files"):
+    with open(path, 'r') as f:
+        data = json.load(f)
+
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
+
+    with open(os.path.join(dir_name, 'index.html'), 'w') as file:
+        file.write(generate_html(data, bg_color))
+
+    with open(os.path.join(dir_name, 'style.css'), 'w') as file:
+        file.write(generate_css(bg_color))
+
+    with open(os.path.join(dir_name, 'main.js'), 'w') as file:
+        file.write(generate_js(data))
+
+def generate_html(data, bg_color):
+    common_meta = {k: data[0]['meta'][k] for k in ["guidance_scale", "strength", "seed", "steps", "H", "W"] if k in data[0]['meta']}
+    common_meta['prompt'] = data[0]['meta'].get('prompt', '')  # Add 'prompt' key to common_meta
+
+    unique_meta_list = []
+
+    for entry in data:
+        meta_info = {k: entry['meta'][k] for k in ["guidance_scale", "strength", "seed", "steps", "H", "W", "prompt"] if k in entry['meta']}
+        unique_meta = {k: v for k, v in meta_info.items() if k not in common_meta or common_meta[k] != v}
+        unique_meta_list.append(unique_meta)
+
+    # Start building the HTML
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Grid</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body style="background-color: {bg_color};">
+    <div class="grid">"""
+
+    for i, entry in enumerate(data):
+        image_url = entry['output'][0]
+        meta_info_str = ', '.join([f"{k}: {v}" for k, v in unique_meta_list[i].items()])
+        html += f"""
+        <div class="cell" data-url="{image_url}" data-meta="{meta_info_str}" onclick="downloadImage(this)">
+            <img src="{image_url}" alt="image">
+            <div class="overlay">
+                <div class="text">{meta_info_str}</div>
+            </div>
+        </div>"""
+
+    common_meta_str = ', '.join([f"{k}: {v}" for k, v in common_meta.items()])
+
+    html += f"""
+    </div>
+    <div class="common-info">
+        <p><strong>Common Meta Information:</strong> {common_meta_str}</p>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>"""
+    return html
+
+def generate_css(bg_color):
+    return f"""
+    body {{
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: {bg_color};
+    }}
+    .grid {{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 50px;
+    }}
+    .cell {{
+        margin: 10px;
+        position: relative;
+    }}
+    .cell img {{
+        width: 200px;
+        height: 200px;
+    }}
+    .overlay {{
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 200px;
+        width: 200px;
+        opacity: 0;
+        transition: .3s ease;
+        background-color: black;
+    }}
+    .cell:hover .overlay {{
+        opacity: 0.8;
+    }}
+    .text {{
+        color: white;
+        font-size: 12px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }}
+    .common-info {{
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        border: 1px solid #333;
+        border-radius: 5px;
+    }}
+    """
+
+def generate_js(data):
+    return """
+    function downloadImage(element) {
+        var url = element.getAttribute('data-url');
+        var meta = element.getAttribute('data-meta');
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = meta.replace(/, /g, '_') + '.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    """
+
