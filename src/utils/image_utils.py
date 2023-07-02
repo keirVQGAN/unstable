@@ -110,7 +110,7 @@ def fetch_images(file_path, api_key):
         json.dump(updated_data, f)
 
 
-def create_web_files(path, bg_color, dir_name="web_files"):
+def web_grid(path, bg_color, dir_name="web_files"):
     with open(path, 'r') as f:
         data = json.load(f)
 
