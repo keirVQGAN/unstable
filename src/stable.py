@@ -6,7 +6,6 @@ import json
 import itertools
 from src.utils.image_upload import ImageUploader
 from src.utils.response_processor import ResponseProcessor
-from src.utils.image_utils import fetch_images
 from src.utils.sys_utils import str2list
 
 class StableAPI:
@@ -14,12 +13,11 @@ class StableAPI:
     CONFIG_PATH = './config/stable'
     HEADERS = {"Content-Type": "application/json"}
 
-    def __init__(self, api_key=None, yaml_path=None, debug=False, fetch_only=False):
+    def __init__(self, api_key=None, yaml_path=None, debug=False):
         self.api_key = api_key
         self.uploader = ImageUploader()
         self.yaml_path = yaml_path
         self.debug = debug
-        self.fetch_only = fetch_only
 
     @staticmethod
     def _load_yaml(file):
@@ -55,15 +53,9 @@ class StableAPI:
         return options
 
     def run(self):
-        if self.fetch_only:
-            self.fetch_images_from_path(self.yaml_path, self.debug)
-            return
-
         options = self.set_options()
         responses, status = self.get_responses(options)
         self.process_responses(responses)
-        if status == 'processing':
-            self.fetch_images_if_processing()
 
     def get_responses(self, options_dict):
         combos = [dict(zip(options_dict, v)) for v in itertools.product(*options_dict.values())]
@@ -113,17 +105,3 @@ class StableAPI:
         for response_data in results:
             ResponseProcessor(response_data).process()
             time.sleep(1)
-
-    def fetch_images_if_processing(self):
-        fetch_images('/content/unstable/output/images/processing.json', self.api_key)
-
-    def fetch_images_from_path(self, file_path=None, stable_debug=None):
-        if stable_debug is None:
-            stable_debug = self.debug
-        if file_path is None:
-            file_path = self.yaml_path
-
-        if stable_debug:
-            print('Fetching Images from' + file_path)
-        fetch_images(file_path, self.api_key)
-
