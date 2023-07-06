@@ -8,6 +8,63 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from IPython.display import display
 from io import BytesIO
+from src.utils.json_utils import write_to_json, append_to_json
+from pathlib import Path
+from datetime import datetime
+
+def fetch_images(file_path, json_output_path, api_key):
+    data = json.loads(Path(file_path).read_text())
+
+    updated_data = []
+    fetched_data = []  # To store data of successfully fetched images
+
+    for item in data:
+        response_data = send_request(item['id'], api_key)
+        output_path = f'./output/images/{item["id"]}'
+
+        if response_data.get('status') == 'success' and response_data.get('output'):
+            try:
+                download_images(response_data['output'], output_path)
+                response_data['meta'] = get_meta_data(item['id'], Path(file_path).parent)
+                response_data['date_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                fetched_data.append(response_data)
+            except Exception as e:
+                print(f"An error occurred while downloading images: {e}")
+            finally:
+                updated_data.append(item)
+
+        elif response_data.get('status') == 'processing':
+            print(f"Image isn't ready to fetch yet. Try again at {item.get('available')}")
+            updated_data.append(item)
+        else:
+            updated_data.append(item)
+
+    Path(file_path).write_text(json.dumps(updated_data, indent=4, separators=(',', ': ')))
+
+    # Write fetched data to fetched.json
+    fetched_file_path = json_output_path
+    for fetched_item in fetched_data:
+        append_to_json(fetched_item, fetched_file_path)
+
+
+def send_request(id, api_key):
+    url = f"https://stablediffusionapi.com/api/v3/fetch/{id}"
+    headers = {'Content-Type': 'application/json'}
+    post_data = json.dumps({"key": api_key})
+    return requests.post(url, headers=headers, data=post_data).json()
+
+
+def download_images(image_urls, output_path):
+    for image_url in image_urls:
+        image_download(image_url, f'{output_path}/{os.path.basename(image_url)}')
+        print(f"Successfully downloaded image from {image_url}")
+
+
+def get_meta_data(id, base_path):
+    # Path to the specific JSON file
+    json_file_path = base_path / f"{id}/json/{id}.json"
+    data = json.loads(json_file_path.read_text())
+    return data.get('meta', {})
 
 
 def img_to_grid(path, save_path, dpi=72, unique_meta=False, width=3):
@@ -78,36 +135,36 @@ def image_download(url, path):
         return None
 
 
-def fetch_images(file_path, api_key):
-    with open(file_path, 'r') as f:
-        data = json.load(f)
+# def fetch_images(file_path, api_key):
+#     with open(file_path, 'r') as f:
+#         data = json.load(f)
 
-    updated_data = []
-    for item in data:
-        url = f"https://stablediffusionapi.com/api/v3/fetch/{item['id']}"
-        headers = {'Content-Type': 'application/json'}
-        post_data = json.dumps({"key": api_key})
+#     updated_data = []
+#     for item in data:
+#         url = f"https://stablediffusionapi.com/api/v3/fetch/{item['id']}"
+#         headers = {'Content-Type': 'application/json'}
+#         post_data = json.dumps({"key": api_key})
 
-        response = requests.post(url, headers=headers, data=post_data)
-        response_data = response.json()
+#         response = requests.post(url, headers=headers, data=post_data)
+#         response_data = response.json()
 
-        if response_data.get('status') == 'success' and response_data.get('output'):
-            output_path = f'./output/images/{item["id"]}'
-            try:
-                for image_url in response_data['output']:
-                    image_download(image_url, f'{output_path}/{os.path.basename(image_url)}')
-                    print(f"Successfully downloaded image from {image_url}")
-            except Exception as e:
-                print(f"An error occurred while downloading images: {e}")
-                updated_data.append(item)
-        elif response_data.get('status') == 'processing':
-            print(f"Image isn't ready to fetch yet. Try again at {item.get('available')}")
-            updated_data.append(item)
-        else:
-            updated_data.append(item)
+#         if response_data.get('status') == 'success' and response_data.get('output'):
+#             output_path = f'./output/images/{item["id"]}'
+#             try:
+#                 for image_url in response_data['output']:
+#                     image_download(image_url, f'{output_path}/{os.path.basename(image_url)}')
+#                     print(f"Successfully downloaded image from {image_url}")
+#             except Exception as e:
+#                 print(f"An error occurred while downloading images: {e}")
+#                 updated_data.append(item)
+#         elif response_data.get('status') == 'processing':
+#             print(f"Image isn't ready to fetch yet. Try again at {item.get('available')}")
+#             updated_data.append(item)
+#         else:
+#             updated_data.append(item)
 
-    with open(file_path, 'w') as f:
-        json.dump(updated_data, f)
+#     with open(file_path, 'w') as f:
+#         json.dump(updated_data, f)
 
 
 def web_grid(path, bg_color, dir_name="web_files"):
