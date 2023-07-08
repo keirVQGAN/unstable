@@ -1,26 +1,38 @@
 from src.utils.image_upload import ImageUploader
+from src.utils.image_utils import image_download
 import requests
 import json
 import time
 import os
+from tqdm import tqdm
 
 class APIUploader:
 
-    def __init__(self, stable_api_key, output_dir='./output/images/'):
+    def __init__(self, stable_api_key, output_dir='./output/images/', scale=3):
         self.stable_api_key = stable_api_key
         self.image_uploader = ImageUploader()
         self.output_dir = output_dir
+        self.scale = scale
         os.makedirs(self.output_dir, exist_ok=True)
+        self.processed_urls = set()  # Set to store processed image URLs
 
     def upload_and_process(self, img_path, delay_sec=5):
         # Upload the image and get the response URL
         response_url = self.image_uploader.upload_img(img_path)
 
+        # Check if the URL has already been processed
+        if response_url in self.processed_urls:
+            print(f"Skipping file: {img_path} (already processed)")
+            return None
+
+        # Add the URL to the set of processed URLs
+        self.processed_urls.add(response_url)
+
         # Prepare the API payload with the response URL
         payload = json.dumps({
             "key": self.stable_api_key,
             "url": response_url,
-            "scale": 3,
+            "scale": self.scale,
             "webhook": None,
             "face_enhance": False
         })
@@ -50,15 +62,26 @@ class APIUploader:
         return api_response
 
     def process_batch(self, folder_path, delay_sec=5):
-        # Iterate through all the files in the folder
-        for filename in os.listdir(folder_path):
-            # Check if the file is an image (adjust the condition as needed)
-            if filename.endswith(".jpg"):
+            # Get the list of image files in the folder
+            image_files = [filename for filename in os.listdir(folder_path) if filename.endswith(".jpg")]
+
+            # Create a progress bar
+            progress_bar = tqdm(image_files, desc="Processing Images", unit="image")
+
+            # Iterate through all the image files in the folder
+            for filename in progress_bar:
                 # Construct the full path to the image
                 img_path = os.path.join(folder_path, filename)
-                
+
+                # Check if the output image already exists
+                output_image_name = os.path.splitext(filename)[0] + '_super.jpg'
+                output_image_path = os.path.join(self.output_dir, output_image_name)
+                if os.path.exists(output_image_path):
+                    progress_bar.set_postfix({"Status": "Skipped", "File": filename})
+                    continue
+
                 # Upload and process the image
                 api_response = self.upload_and_process(img_path, delay_sec)
-                
-                # Print the API response
-                print(api_response)
+
+                # Update the progress bar description
+                progress_bar.set_postfix({"Status": api_response["status"], "File": filename})
