@@ -14,7 +14,6 @@ def image_to_yml(directory):
                 full_file_path = os.path.join(root, file)
                 # Add the file path to the YAML string
                 yml_str += f"  - \"{full_file_path}\"\n"
-    print(yml_str)
     return yml_str
 
 
