@@ -62,26 +62,36 @@ class APIUploader:
         return api_response
 
     def process_batch(self, folder_path, delay_sec=5):
-            # Get the list of image files in the folder
-            image_files = [filename for filename in os.listdir(folder_path) if filename.endswith(".jpg")]
+        # Get the list of image files in the folder
+        image_files = [filename for filename in os.listdir(folder_path) if filename.endswith(".jpg")]
 
-            # Create a progress bar
-            progress_bar = tqdm(image_files, desc="Processing Images", unit="image")
+        # Create a progress bar
+        progress_bar = tqdm(image_files, desc="Processing Images", unit="image")
 
-            # Iterate through all the image files in the folder
-            for filename in progress_bar:
-                # Construct the full path to the image
-                img_path = os.path.join(folder_path, filename)
+        # Iterate through all the image files in the folder
+        for filename in progress_bar:
+            # Construct the full path to the image
+            img_path = os.path.join(folder_path, filename)
 
-                # Check if the output image already exists
-                output_image_name = os.path.splitext(filename)[0] + '_super.jpg'
-                output_image_path = os.path.join(self.output_dir, output_image_name)
-                if os.path.exists(output_image_path):
-                    progress_bar.set_postfix({"Status": "Skipped", "File": filename})
-                    continue
+            # Check if the output image already exists
+            output_image_name = os.path.splitext(filename)[0] + '_super.jpg'
+            output_image_path = os.path.join(self.output_dir, output_image_name)
+            if os.path.exists(output_image_path):
+                progress_bar.set_postfix({"Status": "Skipped", "File": filename})
+                continue
 
-                # Upload and process the image
-                api_response = self.upload_and_process(img_path, delay_sec)
+            # Upload and process the image
+            api_response = self.upload_and_process(img_path, delay_sec)
 
-                # Update the progress bar description
-                progress_bar.set_postfix({"Status": api_response["status"], "File": filename})
+            # Update the progress bar description
+            progress_bar.set_postfix({"Status": api_response["status"], "File": filename})
+
+    def process_directory(self, directory_path, delay_sec=5):
+        for root, dirs, _ in os.walk(directory_path):
+            for dir in dirs:
+                time.sleep(delay_sec * 20)
+                folder_path = os.path.join(root, dir)
+                print(f'Upscale subfolder: {dir}')
+                self.output_dir = os.path.join(self.output_dir, dir)
+                os.makedirs(self.output_dir, exist_ok=True)
+                self.process_batch(folder_path, delay_sec)
