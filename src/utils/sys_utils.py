@@ -7,6 +7,29 @@ from docx import Document
 from datetime import datetime
 
 
+def sort_files(directory, debug=False):
+    dir_path = Path(directory)
+    
+    for file_path in dir_path.iterdir():
+        if file_path.is_file():
+            prefix = file_path.stem.split('_')[0]
+            destination_dir = dir_path / prefix
+            
+            destination_dir.mkdir(exist_ok=True)
+            
+            new_file_path = destination_dir / file_path.name
+            file_path.rename(new_file_path)
+            
+            if debug:
+                print(f"Moved file {file_path.name} to {destination_dir}")
+        elif file_path.is_dir():
+            sort_files(file_path, debug) # recursive call
+            
+    if debug:
+        print(f"Finished sorting files in {directory}")
+
+
+
 def stable_sync(src, dst):
     src, dst = Path(src), Path(dst)
     if not src.exists():
