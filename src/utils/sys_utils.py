@@ -1,78 +1,60 @@
 import os
-from pathlib import Path
-import zipfile
 import shutil
-from dotenv import load_dotenv
-from docx import Document
+from pathlib import Path
+from zipfile import ZipFile
 from datetime import datetime
+from dotenv import load_dotenv
 
-
-def sort_files(directory, debug=False):
-    dir_path = Path(directory)
-    
-    for file_path in dir_path.iterdir():
-        if file_path.is_file():
-            prefix = file_path.stem.split('_')[0]
-            destination_dir = dir_path / prefix
+def sort_files(directory):
+    for path in Path(directory).iterdir():
+        if path.is_file():
+            prefix = path.stem.split('_')[0]
+            destination = Path(directory) / prefix
+            destination.mkdir(exist_ok=True)
+            path.rename(destination / path.name)
+        elif path.is_dir():
+            sort_files(path)
             
-            destination_dir.mkdir(exist_ok=True)
-            
-            new_file_path = destination_dir / file_path.name
-            file_path.rename(new_file_path)
-            
-            if debug:
-                print(f"Moved file {file_path.name} to {destination_dir}")
-        elif file_path.is_dir():
-            sort_files(file_path, debug) # recursive call
-            
-    if debug:
-        print(f"Finished sorting files in {directory}")
-
-
-
 def stable_sync(src, dst):
-    src, dst = Path(src), Path(dst)
-    if not src.exists():
-        print(f"Source folder {src} does not exist")
+    if not Path(src).exists():
+        print(f"{src} does not exist")
         return
-
-    timestamp = datetime.now().strftime("%m%d_%H%M")
-    dst = dst / timestamp
+        
+    dst = Path(dst) / datetime.now().strftime("%m%d_%H%M")
     dst.mkdir(parents=True)
 
-    for item in src.iterdir():
-        if item.is_dir():
-            shutil.copytree(str(item), str(dst / item.name))
+    for path in src.iterdir():
+        dst_path = dst / path.name
+        if path.is_dir():
+            shutil.copytree(path, dst_path)
         else:
-            shutil.copy2(str(item), str(dst / item.name))
+            shutil.copy2(path, dst_path)
+            
+    src.rename(src.parent / datetime.now().strftime("%m%d_%H%M"))
 
-    src.rename(src.parent / timestamp)
-
-
-ENV_VARIABLES = [
-    'OPENAI_API_KEY',
-    'STABLE_API_KEY',
-    'UCARE_API_KEY_PUBLIC',
-    'UCARE_API_KEY_SECRET',
-    'OUT_PATH',
-    'IN_PATH',
-    'CONFIG_PATH'
-]
 
 
 def load_env_file(env_file_path, print_details=True):
-    """Loads environment variables from a file and prints their details."""
-
     shutil.copy(env_file_path, '.env')
     load_dotenv()
-    env_values = {var: os.getenv(var) for var in ENV_VARIABLES}
+    
+    ENV_VARS = [
+        'OPENAI_API_KEY',
+        'STABLE_API_KEY',
+        'UCARE_API_KEY_PUBLIC',
+        'UCARE_API_KEY_SECRET',
+        'OUT_PATH',
+        'IN_PATH',
+        'CONFIG_PATH'
+    ]
 
+    env_values = {var: os.getenv(var) for var in ENV_VARS}
+    
     if print_details:
         for var, value in env_values.items():
-            print(f'{var}: {value}')
-
+            print(f"{var}: {value}")
+            
     return env_values
-
 
 def str2list(s, ignore_commas=False):
     if ignore_commas:
@@ -81,51 +63,21 @@ def str2list(s, ignore_commas=False):
         return [str(i.strip()) for i in s.split(',')]
     return [s]
 
-
-def docx_to_txt(docx_path):
-    """Converts a .docx file into a .txt file."""
-
-    doc = Document(docx_path)
-    text = '\n'.join(paragraph.text for paragraph in doc.paragraphs)
-    txt_path = os.path.splitext(docx_path)[0] + '.txt'
-
-    with open(txt_path, 'w') as txt_file:
-        txt_file.write(text)
-
-    return txt_path
-
-
-def get_files_in_folder(folder_path, ext=''):
-    """Returns a list of filenames in a folder with the given extension."""
-
-    return [
-        os.path.splitext(file)[0] 
-        for file in os.listdir(folder_path) 
-        if file.endswith(ext)
-    ]
-
-
 def create_dirs(dirs):
-    """Creates directories if they don't already exist."""
-
-    if isinstance(dirs, str):  # Handle single string input
+    if isinstance(dirs, str):
         dirs = [dirs]
-
-    for output_dir in dirs:
-        Path(output_dir).mkdir(parents=True, exist_ok=True)
-    
-
-def zip_folder(folder_path, output_filename, ext=None):
-    """Creates a zip file from a folder."""
-
-    with zipfile.ZipFile(output_filename.rstrip(".zip") + ".zip", 'w') as zipf:
+        
+    for path in dirs:
+        Path(path).mkdir(parents=True, exist_ok=True)
+        
+def zip_folder(folder_path, output_filename):
+    with ZipFile(output_filename, 'w') as zipf:
         for root, _, files in os.walk(folder_path):
             for file in files:
-                if ext is None or file.endswith(ext):
-                    zipf.write(
+                zipf.write(
+                    os.path.join(root, file),
+                    arcname=os.path.relpath(
                         os.path.join(root, file), 
-                        arcname=os.path.relpath(
-                            os.path.join(root, file), 
-                            folder_path
-                        )
+                        folder_path
                     )
+                )
