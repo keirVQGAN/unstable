@@ -15,24 +15,6 @@ def sort_files(directory):
         elif path.is_dir():
             sort_files(path)
             
-def stable_sync(src, dst):
-    if not Path(src).exists():
-        print(f"{src} does not exist")
-        return
-        
-    dst = Path(dst) / datetime.now().strftime("%m%d_%H%M")
-    dst.mkdir(parents=True)
-
-    for path in src.iterdir():
-        dst_path = dst / path.name
-        if path.is_dir():
-            shutil.copytree(path, dst_path)
-        else:
-            shutil.copy2(path, dst_path)
-            
-    src.rename(src.parent / datetime.now().strftime("%m%d_%H%M"))
-
-
 
 def load_env_file(env_file_path, print_details=True):
     shutil.copy(env_file_path, '.env')
