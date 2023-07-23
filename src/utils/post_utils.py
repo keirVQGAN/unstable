@@ -39,20 +39,6 @@ def img_to_grid(path, save_path, dpi=72, unique_meta=False, width=3):
     plt.tight_layout()
     plt.savefig(save_path, dpi=dpi)
 
-
-def image_download(url, path):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    response = requests.get(url, stream=True)
-
-    if response.status_code == 200:
-        with open(path, 'wb') as f:
-            response.raw.decode_content = True
-            shutil.copyfileobj(response.raw, f)
-        return path
-    
-    print(f"Error downloading {url}: {response.status_code} - {response.text}")
-
-
 def web_grid(path, bg_color, dir_name="web_files"):
     with open(path) as f:
         data = json.load(f)
