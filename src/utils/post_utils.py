@@ -1,3 +1,34 @@
+import shutil
+import json
+import math
+import textwrap
+from io import BytesIO
+from datetime import datetime
+from pathlib import Path
+import requests
+from PIL import Image
+import matplotlib.pyplot as plt
+from src.utils.sys_utils
+
+
+def stable_sync(src, dst):
+    if not Path(src).exists():
+        print(f"{src} does not exist")
+        return
+        
+    dst = Path(dst) / datetime.now().strftime("%m%d_%H%M")
+    dst.mkdir(parents=True)
+
+    for path in src.iterdir():
+        dst_path = dst / path.name
+        if path.is_dir():
+            shutil.copytree(path, dst_path)
+        else:
+            shutil.copy2(path, dst_path)
+            
+    src.rename(src.parent / datetime.now().strftime("%m%d_%H%M"))
+
+
 def img_to_grid(path, save_path, dpi=72, unique_meta=False, width=3):
     with open(path) as f:
         data = json.load(f)
