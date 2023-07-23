@@ -8,7 +8,7 @@ from pathlib import Path
 import requests
 from PIL import Image
 import matplotlib.pyplot as plt
-from src.utils.sys_utils
+import src.utils.sys_utils
 
 
 def stable_sync(src, dst):
