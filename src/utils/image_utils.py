@@ -59,6 +59,19 @@ def download_images(image_urls, output_path):
         filename = os.path.basename(url)
         image_download(url, f'{output_path}/{filename}')
         print(f"Downloaded {url}")
+        
+
+def image_download(url, path):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    response = requests.get(url, stream=True)
+
+    if response.status_code == 200:
+        with open(path, 'wb') as f:
+            response.raw.decode_content = True
+            shutil.copyfileobj(response.raw, f)
+        return path
+    
+    print(f"Error downloading {url}: {response.status_code} - {response.text}")
 
 
 def get_meta_data(id, base_path):
