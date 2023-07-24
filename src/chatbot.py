@@ -2,7 +2,7 @@ import openai
 import tiktoken
 import json
 from pathlib import Path
-# from src.utils.sys_utils import create_dirs, setup_logging, calculate_token_cost
+from src.utils.sys_utils import create_dirs, setup_logging, calculate_token_cost
 
 class Chatbot:
     COST_PER_TOKEN = {'gpt-3.5-turbo': 0.004, 'gpt-4': 0.03}
