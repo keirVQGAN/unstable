@@ -2,12 +2,12 @@ import openai
 import tiktoken
 import json
 from pathlib import Path
-import logging
+# from src.utils.sys_utils import create_dirs, setup_logging, calculate_token_cost
 
 class Chatbot:
     COST_PER_TOKEN = {'gpt-3.5-turbo': 0.004, 'gpt-4': 0.03}
 
-    def __init__(self, openai_key, system_prompt=None, model="gpt-4", encoding="cl100k_base", chat_history_path='chat_history.json', debug=False):
+    def __init__(self, openai_key, system_prompt=None, model="gpt-3.5-turbo", encoding="cl100k_base", chat_history_path='chat_history.json', debug=False):
         self.system_prompt = system_prompt
         self.model = model
         self.encoding = encoding
@@ -18,7 +18,10 @@ class Chatbot:
         self.debug = debug
 
         if self.debug:
-            logging.basicConfig(filename='chatbot.log', level=logging.DEBUG)
+            setup_logging('chatbot.log')
+
+        # Create the directory for the chat history file if it doesn't exist
+        create_dirs(self.chat_history_path.parent)
 
     def load_system_prompt(self):
         return [{"role": "system", "content": self.system_prompt}] if self.system_prompt else []
@@ -42,12 +45,8 @@ class Chatbot:
     @property
     def used_tokens(self):
         token_count = len(self.encoder.encode(" ".join([msg["content"] for msg in self.messages])))
-        token_cost = self.calculate_token_cost(token_count)
+        token_cost = calculate_token_cost(token_count, self.COST_PER_TOKEN.get(self.model, 0))
         return token_count, token_cost
-
-    def calculate_token_cost(self, token_count):
-        cost_per_token = self.COST_PER_TOKEN.get(self.model, 0)
-        return token_count / 1000 * cost_per_token
 
     def save_chat_history(self):
         try:
