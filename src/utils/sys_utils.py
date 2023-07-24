@@ -1,9 +1,11 @@
 import os
 import shutil
+import pandas as pd
 from pathlib import Path
 from zipfile import ZipFile
 from datetime import datetime
 from dotenv import load_dotenv
+from docx import Document
 
 def sort_files(directory):
     for path in Path(directory).iterdir():
@@ -14,12 +16,11 @@ def sort_files(directory):
             path.rename(destination / path.name)
         elif path.is_dir():
             sort_files(path)
-            
 
 def load_env_file(env_file_path, print_details=True):
     shutil.copy(env_file_path, '.env')
     load_dotenv()
-    
+
     ENV_VARS = [
         'OPENAI_API_KEY',
         'STABLE_API_KEY',
@@ -31,11 +32,11 @@ def load_env_file(env_file_path, print_details=True):
     ]
 
     env_values = {var: os.getenv(var) for var in ENV_VARS}
-    
+
     if print_details:
         for var, value in env_values.items():
             print(f"{var}: {value}")
-            
+
     return env_values
 
 def str2list(s, ignore_commas=False):
@@ -48,10 +49,10 @@ def str2list(s, ignore_commas=False):
 def create_dirs(dirs):
     if isinstance(dirs, str):
         dirs = [dirs]
-        
+
     for path in dirs:
         Path(path).mkdir(parents=True, exist_ok=True)
-        
+
 def zip_folder(folder_path, output_filename):
     with ZipFile(output_filename, 'w') as zipf:
         for root, _, files in os.walk(folder_path):
@@ -59,7 +60,32 @@ def zip_folder(folder_path, output_filename):
                 zipf.write(
                     os.path.join(root, file),
                     arcname=os.path.relpath(
-                        os.path.join(root, file), 
+                        os.path.join(root, file),
                         folder_path
                     )
                 )
+
+def read_excel(path):
+    df = pd.read_excel(path)
+    return df.iloc[:, 0].tolist()
+
+def read_docx(path):
+    doc = Document(path)
+    return [p.text for p in doc.paragraphs if p.text]
+
+def read_txt(path):
+    with open(path, 'r') as file:
+        return file.readlines()
+
+def write_docx(path, content):
+    doc = Document()
+    doc.add_paragraph(content)
+    doc.save(path)
+
+def write_txt_or_csv(path, content):
+    with open(path, 'w') as file:
+        file.write(content + '\n')
+
+def write_xlsx(path, content):
+    df = pd.DataFrame(content.split('\n'), columns=['Reference'])
+    df.to_excel(path, index=False)
