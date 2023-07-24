@@ -6,6 +6,7 @@ from zipfile import ZipFile
 from datetime import datetime
 from dotenv import load_dotenv
 from docx import Document
+import logging
 
 def sort_files(directory):
     for path in Path(directory).iterdir():
@@ -89,3 +90,9 @@ def write_txt_or_csv(path, content):
 def write_xlsx(path, content):
     df = pd.DataFrame(content.split('\n'), columns=['Reference'])
     df.to_excel(path, index=False)
+
+def setup_logging(log_file):
+    logging.basicConfig(filename=log_file, level=logging.DEBUG)
+
+def calculate_token_cost(token_count, cost_per_token):
+    return token_count / 1000 * cost_per_token
