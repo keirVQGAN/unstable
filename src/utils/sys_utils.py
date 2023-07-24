@@ -48,11 +48,12 @@ def str2list(s, ignore_commas=False):
     return [s]
 
 def create_dirs(dirs):
-    if isinstance(dirs, str):
+    if isinstance(dirs, Path) or isinstance(dirs, str):
         dirs = [dirs]
 
     for path in dirs:
         Path(path).mkdir(parents=True, exist_ok=True)
+
 
 def zip_folder(folder_path, output_filename):
     with ZipFile(output_filename, 'w') as zipf:
