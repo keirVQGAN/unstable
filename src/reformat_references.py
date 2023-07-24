@@ -1,3 +1,4 @@
+import os
 from src.utils.sys_utils import read_excel, read_docx, read_txt, write_docx, write_txt_or_csv, write_xlsx
 
 def reformat_references(bot, model, references_path, citation_styles, output_type='txt'):
